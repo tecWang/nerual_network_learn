@@ -20,6 +20,7 @@ from tools import *
 # convolution block: = activation + conv2d + dropout 
 def conv_block(x, nb_filter, dropout_rate=None, weight_decay=1e-4):
     # nb_filter = number of the convolution kernels
+    print("nb_filter", nb_filter)
     x = Activation("relu")(x)
     x = Convolution2D(nb_filter, (3, 3), kernel_initializer="he_uniform", padding="same", use_bias=False, kernel_regularizer=l2(weight_decay))(x)
     if dropout_rate is not None:
@@ -97,16 +98,18 @@ def dense_net(nb_classes, img_dim, depth=40, nb_dense_block=3, growth_rate=12, n
 
 
 # variables
-epochs = 10
-batch_size = 64
 rows = 28
 cols = 28
+nb_classes = 10
 img_dim = (rows, cols, 1)
+
+batch_size = 128
+epochs = 100
 depth = 13
 growth_rate = 12
-nb_classes = 10
+nb_dense_block = 2
 
-train_round = "depth-13"
+train_round = "epochs-" + str(epochs) + "-depth-" + str(depth) + "-nb_dense_block-" + str(nb_dense_block) + "-growth_rate-" +  str(growth_rate) + "-batch_size-" + str(batch_size)
 result_path = "./result/densenet-result"
 result_path = os.path.join(result_path, train_round)
 mkdir(result_path)
@@ -120,7 +123,8 @@ y_train = keras.utils.to_categorical(y_train).astype("float32")
 y_test = keras.utils.to_categorical(y_test).astype("float32")
 
 # build model
-model = dense_net(nb_classes, img_dim, depth, growth_rate=growth_rate)
+print("current model:", train_round)
+model = dense_net(nb_classes, img_dim, depth, nb_dense_block=nb_dense_block, growth_rate=growth_rate)
 # The Adam optimizer has a flexibel learning rate and is fast to solve the best answer
 # The SGD optimizer has a stable learning rate, which means that the accuracy rate improvement effect is consistent from 0 to 1.
 optimizer = keras.optimizers.Adam(lr=1e-4, clipnorm=1.)
@@ -128,7 +132,9 @@ loss = keras.metrics.K.categorical_crossentropy
 model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 model_paint(model, filepath=result_path)
 
+# fit model
 history = model.fit(x_train, y_train, verbose=1, validation_data=(x_test, y_test), epochs=epochs, batch_size=batch_size)
 
-# draw
+# save model and result
+model.save(result_path + "/model.h5")
 acc_loss_paint(history, filepath=result_path)
