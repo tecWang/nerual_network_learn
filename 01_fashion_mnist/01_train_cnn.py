@@ -6,8 +6,12 @@ from keras.models import Model, Sequential
 import numpy as np
 import matplotlib.pyplot as plt 
 from result_visual import *
+from tools import *
 
+train_round = "3layer_full_connections"
 result_path = "./result/cnn-result/"
+result_path = result_path + train_round + "/"
+mkdir(result_path)
 
 # load fashion mnist datasets
 fashion_mnist = tf.keras.datasets.fashion_mnist
@@ -49,26 +53,30 @@ plt.savefig(result_path + "first_25_training_images.png")
 
 # build nn model
 model = Sequential()
-model.add(layers.Conv2D(32, (3, 3),
-                 input_shape=(28, 28, 1), 
-                 activation="relu",
-                 padding='same'))
+model.add(layers.Conv2D(64, (3, 3), input_shape=(28, 28, 1), activation="relu", padding='same'))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.35))    
+model.add(layers.Dropout(0.3))
+
+model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+model.add(layers.Dropout(0.3))   
+
 model.add(layers.Flatten())
 model.add(layers.Dense(128, activation='relu'))
-model.add(layers.Dropout(0.5))
+model.add(layers.Dropout(0.3))
 model.add(layers.Dense(10, activation='softmax'))
 model.compile(loss=keras.metrics.categorical_crossentropy,
-            optimizer=keras.optimizers.Adadelta(),
+            optimizer=keras.optimizers.Adam(),
             metrics=['accuracy'])
+model.summary()
 
     
-model.summary()
+
 history = model.fit(train_images_more_dim, train_labels_onehot, 
-    batch_size=128, validation_split=0.2, epochs=20, verbose=1)
-model.save(result_path + "fashion_mnist_model.h5")
+    batch_size=128, epochs=30, verbose=1, validation_data=(test_images_more_dim, test_labels_onthot))
+model.save(result_path +"fashion_mnist_model.h5")
 
 # evaluate model
 test_loss, test_acc = model.evaluate(test_images_more_dim, test_labels_onthot)

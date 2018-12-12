@@ -2,17 +2,17 @@ import keras
 import matplotlib.pyplot as plt
 
 
-def model_paint(model, filepath="./model.png"):
+def model_paint(model, filepath="./"):
     """
         when rankdir == "TB", vertical layout can be showed
     """
     keras.utils.plot_model(model,
-        to_file=filepath,
+        to_file=filepath + "//model.png",
         show_shapes=True,
         show_layer_names=True,
         rankdir='TB')
 
-def acc_loss_paint(history, filepath="./acc_loss.png"):
+def acc_loss_paint(history, filepath="./"):
 
     plt.figure()
     plt.subplot(1, 2, 1)
@@ -31,4 +31,4 @@ def acc_loss_paint(history, filepath="./acc_loss.png"):
     plt.ylabel('Loss')
     plt.legend(['loss', "val_loss"], loc='lower right')
     plt.tight_layout()
-    plt.savefig(filepath)
+    plt.savefig(filepath + "//acc_loss.png")

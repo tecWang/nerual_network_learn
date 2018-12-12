@@ -6,11 +6,13 @@ from keras.layers import LSTM
 
 # tool
 import matplotlib.pyplot as plt
+from result_visual import *
 
 # variables
 batch_size = 128
 epochs = 20
 num_classes = 10
+result_path = "./result/rnn-result/"
 
 # load data
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
@@ -51,3 +53,7 @@ history = model.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, verb
 scores = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', scores[0])
 print('Test accuracy:', scores[1])
+
+# result visual
+acc_loss_paint(history, filepath=result_path + "acc_loss.png")
+model_paint(model, filepath=result_path + "model.png")
