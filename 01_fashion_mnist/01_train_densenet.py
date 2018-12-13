@@ -61,7 +61,7 @@ def dense_block(x, nb_layers, nb_filter, growth_rate, dropout_rate=None, weight_
 #                           # transition block = conv2d + dropout + avg_pool + bn
 #                           + (dense_block) \
 #                           + Activation + global_pool + dense(prediction)
-def dense_net(nb_classes, img_dim, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=16, 
+def dense_net(nb_classes, img_dim, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=32, 
                 dropout_rate=None, weight_decay=1e-4, verbose=1):
     
     # first layer
@@ -103,13 +103,19 @@ cols = 28
 nb_classes = 10
 img_dim = (rows, cols, 1)
 
-batch_size = 128
-epochs = 100
 depth = 13
-growth_rate = 12
 nb_dense_block = 2
 
-train_round = "epochs-" + str(epochs) + "-depth-" + str(depth) + "-nb_dense_block-" + str(nb_dense_block) + "-growth_rate-" +  str(growth_rate) + "-batch_size-" + str(batch_size)
+growth_rate = 32
+nb_filter = 32
+
+optimizer = "adadelta" # [adadelta, adam]
+batch_size = 32
+epochs = 100
+
+train_round =   "d-" + str(depth) + "-nd-" + str(nb_dense_block) + \
+                "-gr-" +  str(growth_rate) + "-nf-" + str(nb_filter) + \
+                "-" + str(optimizer) + "-bs-" + str(batch_size) + "-epo-" + str(epochs) + \
 result_path = "./result/densenet-result"
 result_path = os.path.join(result_path, train_round)
 mkdir(result_path)
@@ -122,12 +128,13 @@ print("x_train.shape", x_train.shape)
 y_train = keras.utils.to_categorical(y_train).astype("float32")
 y_test = keras.utils.to_categorical(y_test).astype("float32")
 
+
 # build model
 print("current model:", train_round)
 model = dense_net(nb_classes, img_dim, depth, nb_dense_block=nb_dense_block, growth_rate=growth_rate)
 # The Adam optimizer has a flexibel learning rate and is fast to solve the best answer
 # The SGD optimizer has a stable learning rate, which means that the accuracy rate improvement effect is consistent from 0 to 1.
-optimizer = keras.optimizers.Adam(lr=1e-4, clipnorm=1.)
+
 loss = keras.metrics.K.categorical_crossentropy
 model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 model_paint(model, filepath=result_path)
