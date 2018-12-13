@@ -111,17 +111,19 @@ nb_filter = 32
 
 optimizer = "adadelta" # [adadelta, adam]
 batch_size = 32
-epochs = 100
+epochs = 20
 
-train_round =   "d-" + str(depth) + "-nd-" + str(nb_dense_block) + \
-                "-gr-" +  str(growth_rate) + "-nf-" + str(nb_filter) + \
-                "-" + str(optimizer) + "-bs-" + str(batch_size) + "-epo-" + str(epochs) + \
+train_round =   "d" + str(depth) + "-nd" + str(nb_dense_block) + \
+                "-gr" +  str(growth_rate) + "-nf" + str(nb_filter) + \
+                "-" + str(optimizer) + "-bs" + str(batch_size) + "-epo" + str(epochs)
 result_path = "./result/densenet-result"
 result_path = os.path.join(result_path, train_round)
 mkdir(result_path)
 
 # load data
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+x_train = x_train / 255.0
+x_test = x_test / 255.0
 x_train = x_train.reshape(-1, 28, 28, 1).astype("float32")
 x_test = x_test.reshape(-1, 28, 28, 1).astype("float32")
 print("x_train.shape", x_train.shape)
