@@ -3,3 +3,5 @@
 *.pyc
 *.log
 *.pc
+logs/
+result/
